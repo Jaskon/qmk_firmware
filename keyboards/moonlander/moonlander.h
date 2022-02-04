@@ -27,6 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ML_LED_5(status) mcp23018_leds[1] = (bool)status
 #define ML_LED_6(status) mcp23018_leds[2] = (bool)status
 
+// Custom keys
+#define TTI(layer) (TTI_SAFE_RANGE + layer)
+#define LTI(layer, keycode) (LTI_SAFE_RANGE + (layer * 256) + keycode)
+
 #include "quantum.h"
 
 // clang-format off
@@ -58,6 +62,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 enum planck_ez_keycodes {
     TOGGLE_LAYER_COLOR = SAFE_RANGE,
     LED_LEVEL,
+    // Custom keys
+    TTI_SAFE_RANGE,
+    // TODO: wtf? ML_SAFE_RANGE is not so safe? without '+ 10000' it overrides another layer keycodes
+    LTI_SAFE_RANGE = 10000 + TTI_SAFE_RANGE + 16,
+    MY_NEW_SAFE_RANGE = LTI_SAFE_RANGE + 16 * 256,
+
     ML_SAFE_RANGE,
 };
 
