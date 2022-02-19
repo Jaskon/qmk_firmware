@@ -407,6 +407,7 @@ const keypos_t hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
 
 void keyboard_post_init_kb(void) {
     rgb_matrix_enable_noeeprom();
+    custom_keys_init();
     keyboard_post_init_user();
 }
 #endif
@@ -480,6 +481,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             return false;
 #endif
     }
+    process_custom_keys(keycode, record);
     return process_record_user(keycode, record);
 }
 
