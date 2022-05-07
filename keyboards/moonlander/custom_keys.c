@@ -7,6 +7,12 @@ static uint16_t last_key_timer;
 uint16_t last_key_pressed = false;
 bool layer_was_on[16];
 
+enum OS {
+    WINDOWS,
+    MACOS
+};
+static enum OS current_os = WINDOWS;
+
 void custom_keys_init(void) {
     for (uint8_t i = 0; i < 16; i++) {
         layer_was_on[i] = false;
@@ -52,6 +58,26 @@ void _process_LTI(uint8_t layer_num, uint16_t lt_keycode, uint16_t keycode, keyr
     layer_off(layer_num);
 }
 
+void _process_change_os(keyrecord_t *record) {
+    if (record->event.pressed) {
+        current_os = current_os == WINDOWS ? MACOS : WINDOWS;
+    }
+}
+
+void _process_ctrl_left_macos(keyrecord_t *record) {
+    if (record->event.pressed) {
+        return register_code16(LALT(KC_LEFT));
+    }
+    unregister_code16(LALT(KC_LEFT));
+}
+
+void _process_ctrl_right_macos(keyrecord_t *record) {
+    if (record->event.pressed) {
+        return register_code16(LALT(KC_RIGHT));
+    }
+    unregister_code16(LALT(KC_RIGHT));
+}
+
 bool process_custom_keys(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         last_key_pressed = keycode;
@@ -59,13 +85,30 @@ bool process_custom_keys(uint16_t keycode, keyrecord_t *record) {
 
     if (keycode >= TTI_SAFE_RANGE && keycode < LTI_SAFE_RANGE) {
         _process_TTI(keycode - TTI_SAFE_RANGE, keycode, record);
-        return false;
+        return true;
     }
 
     if (keycode >= LTI_SAFE_RANGE && keycode < MY_NEW_SAFE_RANGE) {
         _process_LTI((keycode - LTI_SAFE_RANGE) / 256, (keycode - LTI_SAFE_RANGE) % 256, keycode, record);
-        return false;
+        return true;
     }
 
-    return true;
+    if (keycode == KC_F24) {
+        _process_change_os(record);
+        return true;
+    }
+
+    if (current_os == MACOS) {
+        if (keycode == LCTL(KC_LEFT) || keycode == RCTL(KC_LEFT)) {
+            _process_ctrl_left_macos(record);
+            return true;
+        }
+
+        if (keycode == LCTL(KC_RIGHT) || keycode == RCTL(KC_RIGHT)) {
+            _process_ctrl_right_macos(record);
+            return true;
+        }
+    }
+
+    return false;
 }

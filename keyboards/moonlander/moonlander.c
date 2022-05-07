@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "moonlander.h"
 #include "custom_keys.c"
+#include "custom_colors.c"
 #ifdef WEBUSB_ENABLE
 #include "webusb.h"
 #endif
@@ -172,6 +173,8 @@ void keyboard_pre_init_kb(void) {
     // mcp23018_leds[1] = 0;  // green
     // mcp23018_leds[2] = 0;  // red
 
+    custom_keys_init();
+    init_key_indexes_to_color();
     keyboard_pre_init_user();
 }
 
@@ -407,7 +410,6 @@ const keypos_t hand_swap_config[MATRIX_ROWS][MATRIX_COLS] = {
 
 void keyboard_post_init_kb(void) {
     rgb_matrix_enable_noeeprom();
-    custom_keys_init();
     keyboard_post_init_user();
 }
 #endif
@@ -481,7 +483,9 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
             return false;
 #endif
     }
-    process_custom_keys(keycode, record);
+    if (process_custom_keys(keycode, record)) {
+      return false;
+    }
     return process_record_user(keycode, record);
 }
 
@@ -510,4 +514,8 @@ void eeconfig_init_kb(void) {  // EEPROM is getting reset!
     keyboard_config.led_level_res = 0b11;
     eeconfig_update_kb(keyboard_config.raw);
     eeconfig_init_user();
+}
+
+void rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+  process_custom_colors();
 }
