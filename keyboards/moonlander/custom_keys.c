@@ -78,6 +78,27 @@ void _process_ctrl_right_macos(keyrecord_t *record) {
     unregister_code16(LALT(KC_RIGHT));
 }
 
+void _process_ctrl_backspace_macos(keyrecord_t *record) {
+  if (record->event.pressed) {
+    return register_code16(LALT(KC_BSPACE));
+  }
+  unregister_code16(LALT(KC_BSPACE));
+}
+
+void _process_ctrl_z_macos(keyrecord_t *record) {
+  if (record->event.pressed) {
+    return register_code16(LGUI(KC_Z));
+  }
+  unregister_code16(LGUI(KC_Z));
+}
+
+void _process_ctrl_shift_z_macos(keyrecord_t *record) {
+  if (record->event.pressed) {
+    return register_code16(LGUI(LSFT(KC_Z)));
+  }
+  unregister_code16(LGUI(LSFT(KC_Z)));
+}
+
 bool process_custom_keys(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         last_key_pressed = keycode;
@@ -107,6 +128,18 @@ bool process_custom_keys(uint16_t keycode, keyrecord_t *record) {
         if (keycode == LCTL(KC_RIGHT) || keycode == RCTL(KC_RIGHT)) {
             _process_ctrl_right_macos(record);
             return true;
+        }
+
+        if (keycode == LCTL(KC_BSPACE) || keycode == RCTL(KC_BSPACE)) {
+            _process_ctrl_backspace_macos(record);
+        }
+
+        if (keycode == LCTL(KC_Z) || keycode == RCTL(KC_Z)) {
+          _process_ctrl_z_macos(record);
+        }
+
+        if (keycode == LCTL(LSFT(KC_Z)) || keycode == RCTL(LSFT(KC_Z))) {
+          _process_ctrl_shift_z_macos(record);
         }
     }
 
